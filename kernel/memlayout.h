@@ -6,7 +6,7 @@
 // 00001000 -- boot ROM, provided by qemu
 // 02000000 -- CLINT
 // 0C000000 -- PLIC
-// 10000000 -- uart0 
+// 10010000 -- uart0 (for sifive_u)
 // 10001000 -- virtio disk 
 // 80000000 -- boot ROM jumps here in machine mode
 //             -kernel loads the kernel here
@@ -18,7 +18,7 @@
 // PHYSTOP -- end RAM used by the kernel
 
 // qemu puts UART registers here in physical memory.
-#define UART0 0x10000000L
+#define UART0 0x10010000L
 #define UART0_IRQ 10
 
 // virtio mmio interface

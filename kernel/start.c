@@ -3,6 +3,8 @@
 #include "memlayout.h"
 #include "riscv.h"
 #include "defs.h"
+#include "spinlock.h"
+#include "proc.h"
 
 void main();
 void timerinit();
@@ -31,6 +33,51 @@ start()
   w_mepc((uint64)main);
 
   // disable paging for now.
+
+  // Testing UART/ using it to debug
+  //uint32* uart_test = (uint32*) 0x10010000L;
+  if(r_mhartid() == 1) {
+    uartputc('\n');
+    uartputc('W');
+    uartputc('e');
+    uartputc('l');
+    uartputc('c');
+    uartputc('o');
+    uartputc('m');
+    uartputc('e');
+    uartputc(' ');
+    uartputc('t');
+    uartputc('o');
+    uartputc(' ');
+    uartputc('Q');
+    uartputc('E');
+    uartputc('M');
+    uartputc('U');
+    uartputc('\'');
+    uartputc('s');
+    uartputc(' ');
+    uartputc('s');
+    uartputc('i');
+    uartputc('f');
+    uartputc('i');
+    uartputc('v');
+    uartputc('e');
+    uartputc('_');
+    uartputc('u');
+    uartputc(' ');
+    uartputc('e');
+    uartputc('m');
+    uartputc('u');
+    uartputc('l');
+    uartputc('a');
+    uartputc('t');
+    uartputc('i');
+    uartputc('o');
+    uartputc('n');
+    uartputc('!');
+    uartputc('\n');
+  }
+
   w_satp(0);
 
   // delegate all interrupts and exceptions to supervisor mode.

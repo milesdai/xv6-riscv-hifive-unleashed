@@ -19,6 +19,9 @@
 // some have different meanings for
 // read vs write.
 // http://byterunner.com/16550.html
+#define TXDATA 0 // transmit data register
+#define RXDATA 4 // receive data register
+#define THR 0 // transmit holding register (for output bytes)
 #define RHR 0 // receive holding register (for input bytes)
 #define THR 0 // transmit holding register (for output bytes)
 #define IER 1 // interrupt enable register
@@ -29,6 +32,11 @@
 
 #define ReadReg(reg) (*(Reg(reg)))
 #define WriteReg(reg, v) (*(Reg(reg)) = (v))
+
+#define GetBit(reg, bit) (ReadReg(reg) & (1 << bit))
+#define SetBit(reg, bit) (WriteReg(reg, ReadReg(reg) |= (1 << bit))
+#define ClearBit(reg, bit) (WriteReg(reg, ReadReg(reg) &= ~(1 << bit))
+#define FlipBit(reg, bit) (WriteReg(reg, ReadReg(reg) ^= (1 << bit))
 
 void
 uartinit(void)
@@ -61,9 +69,10 @@ void
 uartputc(int c)
 {
   // wait for Transmit Holding Empty to be set in LSR.
-  while((ReadReg(LSR) & (1 << 5)) == 0)
+  //while((ReadReg(LSR) & (1 << 5)) == 0)
+  while(GetBit(TXDATA, 31) == 1)
     ;
-  WriteReg(THR, c);
+  WriteReg(TXDATA, (uint32) c);
 }
 
 // read one input character from the UART.
@@ -71,9 +80,11 @@ uartputc(int c)
 int
 uartgetc(void)
 {
-  if(ReadReg(LSR) & 0x01){
+  //if(ReadReg(LSR) & 0x01){
+  if(GetBit(RXDATA, 31) == 1){
     // input data is ready.
-    return ReadReg(RHR);
+    //return ReadReg(RHR);
+    return (int) ReadReg(RXDATA);
   } else {
     return -1;
   }
