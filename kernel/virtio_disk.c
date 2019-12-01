@@ -17,6 +17,8 @@
 #include "buf.h"
 #include "virtio.h"
 
+extern char ram_disk[];
+
 // the address of virtio mmio register r.
 #define R(n, r) ((volatile uint32 *)(VIRTION(n) + (r)))
 
@@ -54,6 +56,9 @@ struct disk {
 void
 virtio_disk_init(int n)
 {
+  printf("%p\n", &ram_disk);
+  printf("initalizing virtio\n**************\n");
+  return;
   uint32 status = 0;
 
   __sync_synchronize();
@@ -180,6 +185,16 @@ alloc3_desc(int n, int *idx)
 void
 virtio_disk_rw(int n, struct buf *b, int write)
 {
+  void* block_addr = ram_disk + BSIZE * b->blockno;
+  acquire(&disk[n].vdisk_lock);
+  if(write) {
+    memmove(block_addr, b->data, BSIZE);
+  } else {
+    memmove(b->data, block_addr, BSIZE);
+  }
+  __sync_synchronize();
+  release(&disk[n].vdisk_lock);
+  return;
   uint64 sector = b->blockno * (BSIZE / 512);
 
   acquire(&disk[n].vdisk_lock);

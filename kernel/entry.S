@@ -4,6 +4,9 @@
         # 0x8000000, the _start function here,
         # in machine mode. each CPU starts here.
 .section .data
+ram_disk: .incbin "fs.img"
+.globl ram_disk
+.section .data
 .globl stack0
 .section .text
 .globl start
