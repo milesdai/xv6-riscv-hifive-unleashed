@@ -21,6 +21,11 @@
 // http://byterunner.com/16550.html
 #define TXDATA 0 // transmit data register
 #define RXDATA 4 // receive data register
+#define TXCTRL 8
+#define RXCTRL 12
+#define IE 16
+#define IP 20
+#define DIV 24
 #define THR 0 // transmit holding register (for output bytes)
 #define RHR 0 // receive holding register (for input bytes)
 #define THR 0 // transmit holding register (for output bytes)
@@ -41,6 +46,9 @@
 void
 uartinit(void)
 {
+  WriteReg(RXCTRL, 0x1);
+  WriteReg(IE, 0x3);
+  return;
   // disable interrupts.
   WriteReg(IER, 0x00);
 
@@ -81,7 +89,7 @@ int
 uartgetc(void)
 {
   //if(ReadReg(LSR) & 0x01){
-  if(GetBit(RXDATA, 31) == 1){
+  if(GetBit(RXDATA, 31) == 0){
     // input data is ready.
     //return ReadReg(RHR);
     return (int) ReadReg(RXDATA);
