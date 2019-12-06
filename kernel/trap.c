@@ -201,7 +201,7 @@ devintr()
     // software interrupt from a machine-mode timer interrupt,
     // forwarded by timervec in kernelvec.S.
 
-    if(cpuid() == 0){
+    if(cpuid() == 1){
       clockintr();
     }
     

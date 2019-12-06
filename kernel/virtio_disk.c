@@ -56,76 +56,75 @@ struct disk {
 void
 virtio_disk_init(int n)
 {
-  printf("%p\n", &ram_disk);
-  printf("initalizing virtio\n**************\n");
+  // TODO: make this actually work for the HiFive Unleashed board (no RAM-disk)
   return;
-  uint32 status = 0;
+  //uint32 status = 0;
 
-  __sync_synchronize();
-  if(disk[n].init)
-    return;
+  //__sync_synchronize();
+  //if(disk[n].init)
+  //  return;
 
-  printf("virtio disk init %d\n", n);
-  
-  initlock(&disk[n].vdisk_lock, "virtio_disk");
+  //printf("virtio disk init %d\n", n);
+  //
+  //initlock(&disk[n].vdisk_lock, "virtio_disk");
 
-  if(*R(n, VIRTIO_MMIO_MAGIC_VALUE) != 0x74726976 ||
-     *R(n, VIRTIO_MMIO_VERSION) != 1 ||
-     *R(n, VIRTIO_MMIO_DEVICE_ID) != 2 ||
-     *R(n, VIRTIO_MMIO_VENDOR_ID) != 0x554d4551){
-    panic("could not find virtio disk");
-  }
+  //if(*R(n, VIRTIO_MMIO_MAGIC_VALUE) != 0x74726976 ||
+  //   *R(n, VIRTIO_MMIO_VERSION) != 1 ||
+  //   *R(n, VIRTIO_MMIO_DEVICE_ID) != 2 ||
+  //   *R(n, VIRTIO_MMIO_VENDOR_ID) != 0x554d4551){
+  //  panic("could not find virtio disk");
+  //}
 
-  status |= VIRTIO_CONFIG_S_ACKNOWLEDGE;
-  *R(n, VIRTIO_MMIO_STATUS) = status;
+  //status |= VIRTIO_CONFIG_S_ACKNOWLEDGE;
+  //*R(n, VIRTIO_MMIO_STATUS) = status;
 
-  status |= VIRTIO_CONFIG_S_DRIVER;
-  *R(n, VIRTIO_MMIO_STATUS) = status;
+  //status |= VIRTIO_CONFIG_S_DRIVER;
+  //*R(n, VIRTIO_MMIO_STATUS) = status;
 
-  // negotiate features
-  uint64 features = *R(n, VIRTIO_MMIO_DEVICE_FEATURES);
-  features &= ~(1 << VIRTIO_BLK_F_RO);
-  features &= ~(1 << VIRTIO_BLK_F_SCSI);
-  features &= ~(1 << VIRTIO_BLK_F_CONFIG_WCE);
-  features &= ~(1 << VIRTIO_BLK_F_MQ);
-  features &= ~(1 << VIRTIO_F_ANY_LAYOUT);
-  features &= ~(1 << VIRTIO_RING_F_EVENT_IDX);
-  features &= ~(1 << VIRTIO_RING_F_INDIRECT_DESC);
-  *R(n, VIRTIO_MMIO_DRIVER_FEATURES) = features;
+  //// negotiate features
+  //uint64 features = *R(n, VIRTIO_MMIO_DEVICE_FEATURES);
+  //features &= ~(1 << VIRTIO_BLK_F_RO);
+  //features &= ~(1 << VIRTIO_BLK_F_SCSI);
+  //features &= ~(1 << VIRTIO_BLK_F_CONFIG_WCE);
+  //features &= ~(1 << VIRTIO_BLK_F_MQ);
+  //features &= ~(1 << VIRTIO_F_ANY_LAYOUT);
+  //features &= ~(1 << VIRTIO_RING_F_EVENT_IDX);
+  //features &= ~(1 << VIRTIO_RING_F_INDIRECT_DESC);
+  //*R(n, VIRTIO_MMIO_DRIVER_FEATURES) = features;
 
-  // tell device that feature negotiation is complete.
-  status |= VIRTIO_CONFIG_S_FEATURES_OK;
-  *R(n, VIRTIO_MMIO_STATUS) = status;
+  //// tell device that feature negotiation is complete.
+  //status |= VIRTIO_CONFIG_S_FEATURES_OK;
+  //*R(n, VIRTIO_MMIO_STATUS) = status;
 
-  // tell device we're completely ready.
-  status |= VIRTIO_CONFIG_S_DRIVER_OK;
-  *R(n, VIRTIO_MMIO_STATUS) = status;
+  //// tell device we're completely ready.
+  //status |= VIRTIO_CONFIG_S_DRIVER_OK;
+  //*R(n, VIRTIO_MMIO_STATUS) = status;
 
-  *R(n, VIRTIO_MMIO_GUEST_PAGE_SIZE) = PGSIZE;
+  //*R(n, VIRTIO_MMIO_GUEST_PAGE_SIZE) = PGSIZE;
 
-  // initialize queue 0.
-  *R(n, VIRTIO_MMIO_QUEUE_SEL) = 0;
-  uint32 max = *R(n, VIRTIO_MMIO_QUEUE_NUM_MAX);
-  if(max == 0)
-    panic("virtio disk has no queue 0");
-  if(max < NUM)
-    panic("virtio disk max queue too short");
-  *R(n, VIRTIO_MMIO_QUEUE_NUM) = NUM;
-  memset(disk[n].pages, 0, sizeof(disk[n].pages));
-  *R(n, VIRTIO_MMIO_QUEUE_PFN) = ((uint64)disk[n].pages) >> PGSHIFT;
+  //// initialize queue 0.
+  //*R(n, VIRTIO_MMIO_QUEUE_SEL) = 0;
+  //uint32 max = *R(n, VIRTIO_MMIO_QUEUE_NUM_MAX);
+  //if(max == 0)
+  //  panic("virtio disk has no queue 0");
+  //if(max < NUM)
+  //  panic("virtio disk max queue too short");
+  //*R(n, VIRTIO_MMIO_QUEUE_NUM) = NUM;
+  //memset(disk[n].pages, 0, sizeof(disk[n].pages));
+  //*R(n, VIRTIO_MMIO_QUEUE_PFN) = ((uint64)disk[n].pages) >> PGSHIFT;
 
-  // desc = pages -- num * VRingDesc
-  // avail = pages + 0x40 -- 2 * uint16, then num * uint16
-  // used = pages + 4096 -- 2 * uint16, then num * vRingUsedElem
+  //// desc = pages -- num * VRingDesc
+  //// avail = pages + 0x40 -- 2 * uint16, then num * uint16
+  //// used = pages + 4096 -- 2 * uint16, then num * vRingUsedElem
 
-  disk[n].desc = (struct VRingDesc *) disk[n].pages;
-  disk[n].avail = (uint16*)(((char*)disk[n].desc) + NUM*sizeof(struct VRingDesc));
-  disk[n].used = (struct UsedArea *) (disk[n].pages + PGSIZE);
+  //disk[n].desc = (struct VRingDesc *) disk[n].pages;
+  //disk[n].avail = (uint16*)(((char*)disk[n].desc) + NUM*sizeof(struct VRingDesc));
+  //disk[n].used = (struct UsedArea *) (disk[n].pages + PGSIZE);
 
-  for(int i = 0; i < NUM; i++)
-    disk[n].free[i] = 1;
+  //for(int i = 0; i < NUM; i++)
+  //  disk[n].free[i] = 1;
 
-  disk[n].init = 1;
+  //disk[n].init = 1;
   // plic.c and trap.c arrange for interrupts from VIRTIO0_IRQ.
 }
 

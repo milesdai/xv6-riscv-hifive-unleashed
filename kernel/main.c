@@ -32,7 +32,6 @@ main()
     iinit();         // inode cache
     fileinit();      // file table
     virtio_disk_init(minor(ROOTDEV)); // emulated hard disk
-    printf("finished virtio_disk_init()\n");
     userinit();      // first user process
     __sync_synchronize();
     started = 1;
