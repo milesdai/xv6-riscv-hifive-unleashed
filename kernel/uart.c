@@ -47,7 +47,7 @@ void
 uartinit(void)
 {
   WriteReg(RXCTRL, 0x1);
-  WriteReg(IE, 0x3);
+  WriteReg(IE, 0x2);
   return;
   // disable interrupts.
   WriteReg(IER, 0x00);
@@ -78,9 +78,10 @@ uartputc(int c)
 {
   // wait for Transmit Holding Empty to be set in LSR.
   //while((ReadReg(LSR) & (1 << 5)) == 0)
-  while(GetBit(TXDATA, 31) == 1)
+  int txdata = (int) ReadReg(TXDATA); 
+  while(txdata >> 31 == 1)
     ;
-  WriteReg(TXDATA, (uint32) c);
+  WriteReg(txdata, (uint32) c);
 }
 
 // read one input character from the UART.
@@ -89,10 +90,11 @@ int
 uartgetc(void)
 {
   //if(ReadReg(LSR) & 0x01){
-  if(GetBit(RXDATA, 31) == 0){
+  int rxdata = (int) ReadReg(RXDATA); 
+  if(rxdata >> 31 == 0){
     // input data is ready.
     //return ReadReg(RHR);
-    return (int) ReadReg(RXDATA);
+    return rxdata;
   } else {
     return -1;
   }
