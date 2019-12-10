@@ -19,6 +19,9 @@ _entry:
         # sp = stack0 + (hartid * 4096)
         la sp, stack0
         li a0, 1024*4
+        li t5, 0x10010000
+        li t6, 65
+        sw t6, 0(t5)
 	csrr a1, mhartid
     # loop forever if this is the management core (will cause problems later; better not to count on it)
     beqz a1, junk

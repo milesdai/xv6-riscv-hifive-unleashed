@@ -36,6 +36,7 @@ start()
 
   // Testing UART/ using it to debug
   //uint32* uart_test = (uint32*) 0x10010000L;
+  uartputc('!');
   if(r_mhartid() == 1) {
     uartputc('\n');
     uartputc('W');
@@ -91,6 +92,11 @@ start()
   // keep each CPU's hartid in its tp register, for cpuid().
   int id = r_mhartid();
   w_tp(id);
+
+
+  // setting registers necessary for running xv6 on HiFive Unleashed board
+  w_pmpaddr0(-1);
+  w_pmpcfg0((uint64) 0b11111);
 
   // switch to supervisor mode and jump to main().
   asm volatile("mret");

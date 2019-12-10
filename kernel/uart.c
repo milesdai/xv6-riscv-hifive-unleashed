@@ -79,8 +79,8 @@ uartputc(int c)
   // wait for Transmit Holding Empty to be set in LSR.
   //while((ReadReg(LSR) & (1 << 5)) == 0)
   int txdata = (int) ReadReg(TXDATA); 
-  while(txdata >> 31 == 1)
-    ;
+  //while(txdata >> 31 == 1)
+  //  ;
   WriteReg(txdata, (uint32) c);
 }
 
