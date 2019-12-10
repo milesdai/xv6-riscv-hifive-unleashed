@@ -48,7 +48,7 @@ TOOLPREFIX := $(shell if riscv64-unknown-elf-objdump -i 2>&1 | grep 'elf64-big' 
 	echo "***" 1>&2; exit 1; fi)
 endif
 
-QEMU = ../qemu/riscv64-softmmu/qemu-system-riscv64
+QEMU = qemu/build_2/riscv64-softmmu/qemu-system-riscv64
 
 CC = $(TOOLPREFIX)gcc
 AS = $(TOOLPREFIX)gas
@@ -170,6 +170,12 @@ endif
 QEMUEXTRA = 
 QEMUOPTS = -machine sifive_u -bios none -kernel $K/kernel -m 128M -smp $(CPUS) -nographic
 # QEMUOPTS += -drive file=fs.img,if=none,format=raw,id=x0 -device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0
+
+$K/kernel.bin: $K/kernel
+	$(TOOLPREFIX)objcopy -S -I elf64-little -O binary --change-addresses -0x80000000 $K/kernel $K/kernel.bin
+
+fit: $K/kernel.bin uboot-fit-image.its
+	mkimage -f uboot-fit-image.its -A riscv -O linux -T flat_dt xv6.fit
 
 qemu: $K/kernel fs.img
 	$(QEMU) $(QEMUOPTS)
