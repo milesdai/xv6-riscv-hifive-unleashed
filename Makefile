@@ -152,7 +152,7 @@ fs.img: mkfs/mkfs README user/xargstest.sh $(UPROGS)
 clean: 
 	rm -f *.tex *.dvi *.idx *.aux *.log *.ind *.ilg \
 	*/*.o */*.d */*.asm */*.sym \
-	$U/initcode $U/initcode.out $K/kernel fs.img \
+	$U/initcode $U/initcode.out $K/kernel $K/kernel.bin xv6.fit fs.img \
 	mkfs/mkfs .gdbinit \
         $U/usys.S \
 	$(UPROGS)
